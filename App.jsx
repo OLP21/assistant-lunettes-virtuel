@@ -3,14 +3,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { GlobalStyle } from './styles/GlobalStyle'; // Assure-toi que ce fichier existera
-import { theme } from './styles/theme';           // Assure-toi que ce fichier existera
+import { GlobalStyle } from './src/styles/GlobalStyle'; // Assure-toi que ce fichier existera
+import { theme } from './src/styles/theme';           // Assure-toi que ce fichier existera
 
-import MainLayout from './components/Layout/MainLayout'; // Assure-toi que ce fichier existera
-import HomePage from './pages/HomePage';                 // Assure-toi que ce fichier existera
-import CapturePage from './pages/CapturePage';           // Assure-toi que ce fichier existera
-import QuizPage from './pages/QuizPage';               // Assure-toi que ce fichier existera
-import ResultsPage from './pages/ResultsPage';           // Assure-toi que ce fichier existera
+import MainLayout from './src/components/Layout/MainLayout'; // Assure-toi que ce fichier existera
+import HomePage from './src/pages/HomePage';                 // Assure-toi que ce fichier existera
+import CapturePage from './src/pages/CapturePage';           // Assure-toi que ce fichier existera
+import QuizPage from './src/pages/QuizPage';               // Assure-toi que ce fichier existera
+import ResultsPage from './src/pages/ResultsPage';           // Assure-toi que ce fichier existera
 // import NotFoundPage from './pages/NotFoundPage'; // Tu pourras créer ça plus tard
 
 function App() {
