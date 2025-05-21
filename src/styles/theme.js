@@ -33,4 +33,4 @@ export const theme = {
     //   tablet: '768px',
     //   desktop: '992px',
     // },
-  }; export default theme;
+  }; 
