@@ -149,24 +149,57 @@ useEffect(() => {
       const rightEye = landmarks[263];
 
       // Calcul de la position et la taille des lunettes
-      const dx = rightEye.x - leftEye.x;
+      /*const dx = rightEye.x - leftEye.x;
       const dy = rightEye.y - leftEye.y;
       const distance = Math.sqrt(dx * dx + dy * dy) * canvas.width;
+      */
 
-      const centerX = (leftEye.x + rightEye.x) / 2 * canvas.width;
-      const centerY = (leftEye.y + rightEye.y) / 2 * canvas.height;
+    const leftTemple = landmarks[234];
+    const rightTemple = landmarks[454];
+      
+    // Distance between temples
+    const dx = rightTemple.x - leftTemple.x;
+    const dy = rightTemple.y - leftTemple.y;
+    const distance = Math.sqrt(dx * dx + dy * dy) * canvas.width;
 
-      const glassesWidth = distance * 2.2;
-      const glassesHeight = (overlayImg.current.height / overlayImg.current.width) * glassesWidth;
+    // rotation angle of the head
+
+    const angle = Math.atan2(dy, dx);
+    const nose = landmarks[168];
+
+    // center point between temples
+    const centerX = (leftTemple.x + rightTemple.x) / 2 * canvas.width;
+    const centerY = (leftEye.y + rightEye.y + nose.y) / 3 * canvas.height;
+
+       // ajout d'un point de repère pour le nez
+      /*const centerX = (leftEye.x + rightEye.x) / 2 * canvas.width;
+      const centerY = landmarks[6].y * canvas.height;
+
+      const glassesWidth = distance * 2.1; // increase for wider glasses
+      const aspectRatio = overlayImg.current.height / overlayImg.current.width; // ratio de l'image
+      const glassesHeight = glassesWidth * aspectRatio;
+      */
+
+     // Adjust size based on PNG aspect ration
+     const glassesWidth = distance * 1.3;
+     const aspectRatio = overlayImg.current.height / overlayImg.current.width;
+     const glassesHeight = glassesWidth * aspectRatio;
+     
+
+     ctx.save(); // save current canvas transform
+     ctx.translate(centerX, centerY);
+     ctx.rotate(angle);
+     ctx.globalAlpha = 0.65// transparence des lunettes
 
       // Draw glasses overlay
-      ctx.drawImage(
-        overlayImg.current,
-        centerX - glassesWidth / 2,
-        centerY - glassesHeight / 2,
-        glassesWidth,
-        glassesHeight
-      );
+    ctx.drawImage(
+      overlayImg.current,
+      - glassesWidth / 2,
+      - glassesHeight / 2,
+      glassesWidth,
+      glassesHeight
+    );
+    ctx.restore(); // Reset canvas transform
     }
   }
 
