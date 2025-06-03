@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import Button from '../components/common/Button';
+import { useNavigate } from 'react-router-dom';
 
 const PageContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
@@ -25,6 +26,9 @@ const PlaceholderText = styled.p`
 `;
 
 const QuizPage = () => {
+
+  const navigate = useNavigate();
+
   return (
     <PageContainer>
       <Title>Étape 2: Exprimez Votre Style</Title>
@@ -37,6 +41,11 @@ const QuizPage = () => {
       <Link to="/recommendations">
         <Button variant="outline">Voir les Recommandations (Test)</Button>
       </Link>
+
+      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+          <Button variant="primary" onClick={() => navigate('/start-analysis')}>Précédent</Button>
+          <Button variant="primary" onClick={() => navigate('/recommendations')}>Suivant</Button>
+        </div>
     </PageContainer>
   );
 };
