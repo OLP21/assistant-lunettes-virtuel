@@ -1,6 +1,6 @@
 // src/components/GlassesGallery.jsx
 
-import react from 'react'; 
+import React from 'react'; 
 import glassesData from '../data/glasses';
 
 const GlassesGallery = ({ onSelect}) => {
