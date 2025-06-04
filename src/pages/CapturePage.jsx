@@ -1,11 +1,14 @@
 // src/pages/CapturePage.jsx
 import React, {useRef, useEffect, useState} from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import Button from '../components/common/Button'; 
 import { FaceMesh} from '@mediapipe/face_mesh'; // à définir parce que je ne sais pas ce facemesh fait
 import { Camera } from '@mediapipe/camera_utils'; // importation de la bibliothèque qui permet d'utiliser la cam
 import GlassesGallery from '../components/GlassesGallery'; // utilisation du composant GlassesGallery pour vérifier si la nouvelle galerie de lunettes fonctionne
+import { useNavigate } from 'react-router-dom';
+import PageNavigation from '../components/common/PageNavigation';
+
+
 
 const PageContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
@@ -34,6 +37,7 @@ const Canvas = styled.canvas`
 
 // Définition du composant
 const CapturePage = () => { 
+  const navigate = useNavigate();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -242,9 +246,8 @@ return () =>{
         {/* Ajout du composant GlassesGallery */}
         <GlassesGallery onSelect={setSelectedGlasses}/>
 
-      <Link to="/preferences-quiz" style= {{ marginTop: '2rem'}}>
-        <Button variant="outline">Passer au Questionnaire</Button>
-      </Link>
+        <PageNavigation previous="/" next="/preferences-quiz"/>
+
     </PageContainer>
   );
 };

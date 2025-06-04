@@ -1,7 +1,9 @@
 // src/pages/ResultsPage.jsx
 import React from 'react';
 import styled from 'styled-components';
-// import Button from '../components/common/Button'; (si besoin de navigation)
+import Button from '../components/common/Button';
+import PageNavigation from '../components/common/PageNavigation';
+import { useNavigate } from 'react-router-dom';
 
 const PageContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
@@ -24,6 +26,9 @@ const PlaceholderText = styled.p`
 `;
 
 const ResultsPage = () => {
+
+  const navigate = useNavigate();
+
   return (
     <PageContainer>
       <Title>Votre Sélection Personnalisée</Title>
@@ -31,6 +36,8 @@ const ResultsPage = () => {
         Affichage de la galerie des lunettes recommandées par l'IA.
         <br />
         (Logique IA par Teddy, Affichage par Mame Mor)
+
+        <PageNavigation previous='/preferences-quiz'/>
       </PlaceholderText>
       {/* Ici, tu mapperas sur les résultats pour afficher des RecommendationCard */}
     </PageContainer>
