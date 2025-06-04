@@ -2,6 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import PageNavigation from '../components/common/PageNavigation';
 import Button from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,10 +43,7 @@ const QuizPage = () => {
         <Button variant="outline">Voir les Recommandations (Test)</Button>
       </Link>
 
-      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', width: '100%'}}>
-          <Button variant="primary" onClick={() => navigate('/start-analysis')}>Précédent</Button>
-          <Button variant="primary" onClick={() => navigate('/recommendations')}>Suivant</Button>
-        </div>
+      <PageNavigation previous="/start-analysis" next="/recommendations"/>
     </PageContainer>
   );
 };

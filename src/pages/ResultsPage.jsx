@@ -2,6 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../components/common/Button';
+import PageNavigation from '../components/common/PageNavigation';
 import { useNavigate } from 'react-router-dom';
 
 const PageContainer = styled.div`
@@ -36,9 +37,7 @@ const ResultsPage = () => {
         <br />
         (Logique IA par Teddy, Affichage par Mame Mor)
 
-        <Button variant="outline" onClick={() => navigate('/preferences-quiz')}>
-  Précédent
-</Button>
+        <PageNavigation previous='/preferences-quiz'/>
       </PlaceholderText>
       {/* Ici, tu mapperas sur les résultats pour afficher des RecommendationCard */}
     </PageContainer>
