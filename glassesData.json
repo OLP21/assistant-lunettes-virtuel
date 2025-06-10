@@ -1,152 +1,423 @@
 [
   {
-    "code": "OX8156",
-    "imageUrl": "/assets/lunettes/OX8156.png",
-    "brand": "Oakley"
-  },
-  {
-    "code": "RX7066",
-    "imageUrl": "/assets/lunettes/RX7066.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX2201V",
-    "imageUrl": "/assets/lunettes/RX2201V.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX8157V",
-    "imageUrl": "/assets/lunettes/RX8157V.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "VO5355",
-    "imageUrl": "/assets/lunettes/VO5355.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "VO5326",
-    "imageUrl": "/assets/lunettes/VO5326.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "VO5371",
-    "imageUrl": "/assets/lunettes/VO5371.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "RX4640V",
-    "imageUrl": "/assets/lunettes/RX4640V.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "VO5317",
-    "imageUrl": "/assets/lunettes/VO5317.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "RX7190",
-    "imageUrl": "/assets/lunettes/RX7190.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "VO5422",
-    "imageUrl": "/assets/lunettes/VO5422.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "RX6450",
-    "imageUrl": "/assets/lunettes/RX6450.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX6455",
-    "imageUrl": "/assets/lunettes/RX6455.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX6434",
-    "imageUrl": "/assets/lunettes/RX6434.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "OX8026",
-    "imageUrl": "/assets/lunettes/OX8026.png",
-    "brand": "Oakley"
-  },
-  {
-    "code": "RX5486",
-    "imageUrl": "/assets/lunettes/RX5486.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX5394",
-    "imageUrl": "/assets/lunettes/RX5394.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "AN6126",
-    "imageUrl": "/assets/lunettes/AN6126.png",
-    "brand": "Armani Exchange"
-  },
-  {
-    "code": "RX5398",
-    "imageUrl": "/assets/lunettes/RX5398.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "PO3238V",
-    "imageUrl": "/assets/lunettes/PO3238V.png",
-    "brand": "Persol"
-  },
-  {
-    "code": "PO3237V",
-    "imageUrl": "/assets/lunettes/PO3237V.png",
-    "brand": "Persol"
-  },
-  {
-    "code": "RX5388",
-    "imageUrl": "/assets/lunettes/RX5388.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "RX5375",
-    "imageUrl": "/assets/lunettes/RX5375.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "VO5053",
-    "imageUrl": "/assets/lunettes/VO5053.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "AN7209",
-    "imageUrl": "/assets/lunettes/AN7209.png",
-    "brand": "Armani Exchange"
-  },
-  {
-    "code": "VO5387",
-    "imageUrl": "/assets/lunettes/VO5387.png",
-    "brand": "Vogue"
-  },
-  {
-    "code": "PO2453V",
-    "imageUrl": "/assets/lunettes/PO2453V.png",
-    "brand": "Persol"
-  },
-  {
-    "code": "RX8420",
-    "imageUrl": "/assets/lunettes/RX8420.png",
-    "brand": "Ray-Ban"
-  },
-  {
-    "code": "OV5459U",
+    "id": "OV5459U",
+    "name": "Oliver Peoples OV5459U Panto Vert d'Eau",
     "imageUrl": "/assets/lunettes/OV5459U.png",
-    "brand": "Oliver Peoples"
+    "brand": "Oliver Peoples",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "coeur"],
+      "style": "vintage",
+      "frameShape": "panto",
+      "material": "acétate",
+      "colors": ["vert d'eau", "transparent", "bleu-gris clair"],
+      "vibe": "sophistiqué"
+    }
   },
   {
-    "code": "RX6489",
+    "id": "OX8026",
+    "name": "Oakley OX8026 Sport Rectangulaire Noir/Rouge Brique",
+    "imageUrl": "/assets/lunettes/OX8026.png",
+    "brand": "Oakley",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "sportif",
+      "frameShape": "rectangulaire enveloppante",
+      "material": "plastique injecté",
+      "colors": ["noir mat", "rouge brique"],
+      "vibe": "actif"
+    }
+  },
+  {
+    "id": "AN7209",
+    "name": "Armani Exchange AN7209 Carré Noir Brillant",
+    "imageUrl": "/assets/lunettes/AN7209.png",
+    "brand": "Armani Exchange",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne",
+      "frameShape": "carré",
+      "material": "acétate",
+      "colors": ["noir brillant"],
+      "vibe": "urbain"
+    }
+  },
+  {
+    "id": "PO2453V",
+    "name": "Persol PO2453V Aviateur Rond Doré/Écaille",
+    "imageUrl": "/assets/lunettes/PO2453V.png",
+    "brand": "Persol",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "coeur"],
+      "style": "classique",
+      "frameShape": "aviateur rond",
+      "material": "mixte",
+      "colors": ["doré", "écaille", "havana"],
+      "vibe": "élégant"
+    }
+  },
+  {
+    "id": "PO3237V",
+    "name": "Persol PO3237V Panto Écaille",
+    "imageUrl": "/assets/lunettes/PO3237V.png",
+    "brand": "Persol",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "allongé", "coeur"],
+      "style": "iconique",
+      "frameShape": "panto",
+      "material": "acétate",
+      "colors": ["écaille", "havana"],
+      "vibe": "sophistiqué"
+    }
+  },
+  {
+    "id": "PO3238V",
+    "name": "Persol PO3238V Panto Noir",
+    "imageUrl": "/assets/lunettes/PO3238V.png",
+    "brand": "Persol",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "allongé"],
+      "style": "classique",
+      "frameShape": "panto",
+      "material": "acétate",
+      "colors": ["noir"],
+      "vibe": "intellectuel"
+    }
+  },
+  {
+    "id": "RX2201V",
+    "name": "Ray-Ban RX2201V Wayfarer Noir",
+    "imageUrl": "/assets/lunettes/RX2201V.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["rond", "ovale", "allongé"],
+      "style": "iconique",
+      "frameShape": "wayfarer",
+      "material": "acétate",
+      "colors": ["noir"],
+      "vibe": "décontracté chic"
+    }
+  },
+  {
+    "id": "RX4640V",
+    "name": "Ray-Ban RX4640V Rectangulaire Noir",
+    "imageUrl": "/assets/lunettes/RX4640V.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne",
+      "frameShape": "rectangulaire",
+      "material": "acétate",
+      "colors": ["noir"],
+      "vibe": "professionnel"
+    }
+  },
+  {
+    "id": "RX5375",
+    "name": "Ray-Ban RX5375 Carré Écaille/Transparent",
+    "imageUrl": "/assets/lunettes/RX5375.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "tendance",
+      "frameShape": "carré",
+      "material": "acétate",
+      "colors": ["écaille", "havana", "transparent", "crystal"],
+      "vibe": "jeune"
+    }
+  },
+  {
+    "id": "RX5388",
+    "name": "Ray-Ban RX5388 Rectangulaire Épais Écaille",
+    "imageUrl": "/assets/lunettes/RX5388.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["rond", "ovale", "allongé"],
+      "style": "audacieux",
+      "frameShape": "rectangulaire épais",
+      "material": "acétate",
+      "colors": ["écaille foncée", "havana"],
+      "vibe": "affirmé"
+    }
+  },
+  {
+    "id": "RX5394",
+    "name": "Ray-Ban RX5394 Clubmaster Évolué Bicolore",
+    "imageUrl": "/assets/lunettes/RX5394.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "coeur", "rond"],
+      "style": "rétro-moderne",
+      "frameShape": "clubmaster",
+      "material": "mixte",
+      "colors": ["caramel", "beige", "crème", "marron clair"],
+      "vibe": "stylé"
+    }
+  },
+  {
+    "id": "RX5398",
+    "name": "Ray-Ban RX5398 Hawkeye Bicolore",
+    "imageUrl": "/assets/lunettes/RX5398.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "rond", "coeur"],
+      "style": "vintage",
+      "frameShape": "hawkeye",
+      "material": "acétate",
+      "colors": ["marron glacé", "transparent", "crystal", "beige"],
+      "vibe": "intellectuel chic"
+    }
+  },
+  {
+    "id": "RX5486",
+    "name": "Ray-Ban RX5486 Forme Unique Écaille/Beige",
+    "imageUrl": "/assets/lunettes/RX5486.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "rond", "carré"],
+      "style": "original",
+      "frameShape": "géométrique adoucie",
+      "material": "acétate",
+      "colors": ["écaille foncée", "beige", "crème"],
+      "vibe": "artistique"
+    }
+  },
+  {
+    "id": "RX6434",
+    "name": "Ray-Ban RX6434 Navigateur Métal Argenté",
+    "imageUrl": "/assets/lunettes/RX6434.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "carré"],
+      "style": "classique",
+      "frameShape": "navigateur",
+      "material": "métal",
+      "colors": ["argenté", "gris"],
+      "vibe": "sobre"
+    }
+  },
+  {
+    "id": "RX6450",
+    "name": "Ray-Ban RX6450 Aviateur Métal Doré/Écaille",
+    "imageUrl": "/assets/lunettes/RX6450.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "carré", "coeur"],
+      "style": "tendance",
+      "frameShape": "aviateur",
+      "material": "mixte",
+      "colors": ["doré", "écaille", "havana", "marron"],
+      "vibe": "élégant décontracté"
+    }
+  },
+  {
+    "id": "RX6455",
+    "name": "Ray-Ban RX6455 Aviateur Rond Métal Argenté",
+    "imageUrl": "/assets/lunettes/RX6455.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "coeur"],
+      "style": "moderne",
+      "frameShape": "aviateur rond",
+      "material": "métal",
+      "colors": ["argenté", "gris", "noir"],
+      "vibe": "minimaliste"
+    }
+  },
+  {
+    "id": "RX6489",
+    "name": "Ray-Ban RX6489 Aviateur Classique Doré",
     "imageUrl": "/assets/lunettes/RX6489.png",
-    "brand": "Ray-Ban"
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "carré", "coeur"],
+      "style": "iconique",
+      "frameShape": "aviateur",
+      "material": "métal",
+      "colors": ["doré", "noir"],
+      "vibe": "intemporel"
+    }
+  },
+  {
+    "id": "RX7066",
+    "name": "Ray-Ban RX7066 Rectangulaire Bleu Gris Translucide",
+    "imageUrl": "/assets/lunettes/RX7066.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne",
+      "frameShape": "rectangulaire",
+      "material": "acétate",
+      "colors": ["bleu-gris", "transparent", "gris"],
+      "vibe": "décontracté"
+    }
+  },
+  {
+    "id": "RX7190",
+    "name": "Ray-Ban RX7190 Panto Écaille",
+    "imageUrl": "/assets/lunettes/RX7190.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "allongé"],
+      "style": "classique",
+      "frameShape": "panto",
+      "material": "acétate",
+      "colors": ["écaille", "havana"],
+      "vibe": "intellectuel"
+    }
+  },
+  {
+    "id": "RX8157V",
+    "name": "Ray-Ban RX8157V Titane Rond Vintage Bronze",
+    "imageUrl": "/assets/lunettes/RX8157V.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "coeur"],
+      "style": "vintage",
+      "frameShape": "rond",
+      "material": "titane",
+      "colors": ["bronze", "canon de fusil", "écaille claire"],
+      "vibe": "raffiné"
+    }
+  },
+  {
+    "id": "RX8420",
+    "name": "Ray-Ban RX8420 Aviateur Argenté/Branches à Motifs",
+    "imageUrl": "/assets/lunettes/RX8420.png",
+    "brand": "Ray-Ban",
+    "tags": {
+      "shapeMatch": ["ovale", "carré", "coeur"],
+      "style": "tendance",
+      "frameShape": "aviateur",
+      "material": "métal",
+      "colors": ["argenté", "bleu", "blanc", "motif"],
+      "vibe": "original"
+    }
+  },
+  {
+    "id": "VO5053",
+    "name": "Vogue VO5053 Rectangulaire Marron Texturé",
+    "imageUrl": "/assets/lunettes/VO5053.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne",
+      "frameShape": "rectangulaire",
+      "material": "acétate",
+      "colors": ["marron", "beige", "texturé"],
+      "vibe": "naturel chic"
+    }
+  },
+  {
+    "id": "VO5317",
+    "name": "Vogue VO5317 Cat-Eye Écaille",
+    "imageUrl": "/assets/lunettes/VO5317.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["rond", "ovale", "diamant"],
+      "style": "rétro",
+      "frameShape": "papillon",
+      "material": "acétate",
+      "colors": ["écaille", "havana", "transparent"],
+      "vibe": "glamour"
+    }
+  },
+  {
+    "id": "VO5326",
+    "name": "Vogue VO5326 Rond Bleu Ciel",
+    "imageUrl": "/assets/lunettes/VO5326.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["carré", "ovale", "coeur"],
+      "style": "jeune",
+      "frameShape": "rond",
+      "material": "acétate",
+      "colors": ["bleu ciel", "transparent", "argenté"],
+      "vibe": "frais"
+    }
+  },
+  {
+    "id": "VO5355",
+    "name": "Vogue VO5355 Cat-Eye Noir/Blanc",
+    "imageUrl": "/assets/lunettes/VO5355.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["rond", "ovale", "diamant"],
+      "style": "audacieux",
+      "frameShape": "papillon",
+      "material": "acétate",
+      "colors": ["noir", "blanc"],
+      "vibe": "dramatique"
+    }
+  },
+  {
+    "id": "VO5371",
+    "name": "Vogue VO5371 Carré Épais Noir",
+    "imageUrl": "/assets/lunettes/VO5371.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne affirmé",
+      "frameShape": "carré épais",
+      "material": "acétate",
+      "colors": ["noir"],
+      "vibe": "fort"
+    }
+  },
+  {
+    "id": "VO5387",
+    "name": "Vogue VO5387 Cat-Eye Transparent/Doré",
+    "imageUrl": "/assets/lunettes/VO5387.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["ovale", "coeur", "diamant"],
+      "style": "élégant",
+      "frameShape": "papillon",
+      "material": "mixte",
+      "colors": ["transparent", "crystal", "doré", "blanc"],
+      "vibe": "léger chic"
+    }
+  },
+  {
+    "id": "VO5422",
+    "name": "Vogue VO5422 Cat-Eye Rouge Vif",
+    "imageUrl": "/assets/lunettes/VO5422.png",
+    "brand": "Vogue",
+    "tags": {
+      "shapeMatch": ["rond", "ovale", "diamant"],
+      "style": "audacieux",
+      "frameShape": "papillon",
+      "material": "acétate",
+      "colors": ["rouge vif"],
+      "vibe": "passionné"
+    }
+  },
+  {
+    "id": "OX8156", 
+    "name": "Oakley OX8156 Rectangulaire Noir",
+    "imageUrl": "/assets/lunettes/OX8156.png",
+    "brand": "Oakley",
+    "tags": {
+      "shapeMatch": ["rond", "ovale"],
+      "style": "moderne",
+      "frameShape": "rectangulaire",
+      "material": "acétate",
+      "colors": ["noir", "noir mat"],
+      "vibe": "affirmé"
+    }
+  },
+  {
+    "id": "AN6126", 
+    "name": "Armani Exchange AN6126 Demi-Cerclée Argenté/Rouge",
+    "imageUrl": "/assets/lunettes/AN6126.png",
+    "brand": "Armani Exchange",
+    "tags": {
+      "shapeMatch": ["ovale", "carré", "allongé"],
+      "style": "moderne",
+      "frameShape": "rectangulaire demi-cerclée",
+      "material": "métal",
+      "colors": ["argenté", "gris clair", "rouge", "corail"],
+      "vibe": "dynamique"
+    }
   }
+  
 ]
