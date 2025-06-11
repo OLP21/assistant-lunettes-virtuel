@@ -1,256 +1,279 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
+// --- ANIMATIONS ---
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const cardVariants = {
+  initial: { scale: 1, opacity: 1, x: 0 },
+  liked: { x: 150, rotate: 20, opacity: 0 },
+  disliked: { x: -150, rotate: -20, opacity: 0 }
+};
+
+const questionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
+// --- STYLES ---
 const PageContainer = styled.div`
   padding: 2rem;
-  text-align: center;
-  min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  background: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
 `;
 
 const Title = styled.h2`
-  margin-bottom: 1.5rem;
-`;
-
-const Image = styled.img`
-  width: 300px;
-  height: 400px;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  object-fit: contain;
   margin-bottom: 1rem;
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 2rem;
 `;
 
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-bottom: 2rem;
-  justify-content: center;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
+const Instructions = styled.p`
+  margin-bottom: 1rem;
   font-size: 1.1rem;
-  background-color: ${({ like }) => (like ? '#28a745' : '#dc3545')};
-  color: white;
-
-  &:hover {
-    opacity: 0.9;
-  }
+  color: ${({ theme }) => theme.colors.textSecondary};
+  animation: ${fadeIn} 0.5s ease;
 `;
 
-const QuestionTitle = styled.h3`
+const Counter = styled.div`
   margin-bottom: 1rem;
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
-const ChoicesContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+const SwipeContainer = styled.div`
+  position: relative;
+  width: 90vw;
+  max-width: 400px;
+  min-height: 450px;
   margin-bottom: 2rem;
 `;
 
-const ChoiceButton = styled.button`
-  border: 2px solid ${({ selected }) => (selected ? '#007bff' : '#ccc')};
-  border-radius: 12px;
-  padding: 10px;
-  width: 140px;
-  cursor: pointer;
-  background-color: ${({ selected }) => (selected ? '#e6f0ff' : '#fff')};
-  transition: all 0.3s ease;
+const Card = styled.div`
+  width: 90%;
+  max-width: 350px;
+  aspect-ratio: 3/4;
+  border-radius: 20px;
+  background: ${({ theme }) => theme.colors.surface || '#fff'};
+  box-shadow: 0px 10px 30px -5px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 1.5rem;
+  justify-content: space-around;
+  padding: 1rem;
   user-select: none;
-
-  &:hover {
-    border-color: #007bff;
-  }
+  overflow: hidden;
+  position: relative;
 `;
 
-const NextButton = styled.button`
-  padding: 10px 30px;
-  border-radius: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+const CardImage = styled.img`
+  max-width: 95%;
+  max-height: 60%;
+  object-fit: contain;
+`;
+
+const CardLabel = styled.div`
   margin-top: 1rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
-const QuizPage = () => {
-  // Étape 1 : Swipe simplifié avec boutons "J’aime" / "J’aime pas"
-  const glassesImages = [
-    'assets/lunettes/AN6216.png',
-    'assets/lunettes/AN7209.png',
-    'assets/lunettes/OV5459U.png',
-    'assets/lunettes/OX8026.png',
-    'assets/lunettes/OX8156.png',
-  ];
+const ButtonOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  pointer-events: none;
+`;
 
-  const [currentGlassesIndex, setCurrentGlassesIndex] = useState(0);
-  const [likedGlasses, setLikedGlasses] = useState({});
-  const [currentStep, setCurrentStep] = useState('swipe'); // swipe ou questions
+const ConfirmButton = styled.button`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: ${({ positive }) => (positive ? '#28a74522' : '#dc354522')};
+  color: ${({ positive }) => (positive ? '#28a745' : '#dc3545')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+`;
 
-  // Étape 2 : Questions avec choix multiples emojis
-  const questions = [
-    {
-      id: 1,
-      question: "Quel style de lunettes préférez-vous ?",
-      choices: [
-        { id: 'classique', label: 'Classique', emoji: '👓' },
-        { id: 'moderne', label: 'Moderne', emoji: '🕶️' },
-        { id: 'rétro', label: 'Rétro', emoji: '🥽' },
-        { id: 'sport', label: 'Sport', emoji: '🏃‍♂️' },
-      ],
-    },
-    {
-      id: 2,
-      question: "Quelle matière préférez-vous pour vos lunettes ?",
-      choices: [
-        { id: 'metal', label: 'Métal', emoji: '🔩' },
-        { id: 'plastique', label: 'Plastique', emoji: '🧴' },
-        { id: 'bois', label: 'Bois', emoji: '🌳' },
-        { id: 'titane', label: 'Titane', emoji: '⚙️' },
-      ],
-    },
-    {
-      id: 3,
-      question: "Pour quelle occasion portez-vous principalement vos lunettes ?",
-      choices: [
-        { id: 'quotidien', label: 'Quotidien', emoji: '🏠' },
-        { id: 'travail', label: 'Travail', emoji: '💼' },
-        { id: 'sport', label: 'Sport', emoji: '⚽' },
-        { id: 'sorties', label: 'Sorties', emoji: '🎉' },
-      ],
-    },
-    {
-      id: 4,
-      question: "Quelle couleur vous attire le plus ?",
-      choices: [
-        { id: 'noir', label: 'Noir', emoji: '⬛' },
-        { id: 'marron', label: 'Marron', emoji: '🟫' },
-        { id: 'transparent', label: 'Transparent', emoji: '⬜' },
-        { id: 'rouge', label: 'Rouge', emoji: '🟥' },
-      ],
-    },
-  ];
+const QuestionContainer = styled.div`
+  width: 100%;
+  max-width: 450px;
+  padding: 1rem;
+  text-align: center;
+`;
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+const QuestionText = styled.h3`
+  margin-bottom: 1rem;
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const OptionButton = styled.button`
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.colors.surface};
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover { background: ${({ theme }) => theme.colors.primary}20; }
+`;
+
+const FinishContainer = styled.div`
+  text-align: center;
+  margin-top: 2rem;
+`;
+
+const FinishButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.background === '#12121F' ? '#fff' : theme.colors.background};
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+`;
+
+export default function QuizPage() {
+  const [glasses, setGlasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [phase, setPhase] = useState('cards');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [lastDir, setLastDir] = useState(null);
+  const [likedMap, setLikedMap] = useState({});
+
+  const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [showFinish, setShowFinish] = useState(false);
+  const navigate = useNavigate();
 
-  // Gestion choix j'aime / j'aime pas lunettes
-  const handleGlassesChoice = (like) => {
-    const image = glassesImages[currentGlassesIndex];
-    setLikedGlasses((prev) => ({
-      ...prev,
-      [image]: like,
-    }));
+  const questions = [
+    { key: 'frameMaterial', text: 'Quel matériau préférez-vous pour la monture ?', options: ['Métal', 'Acétate', 'Bois'] },
+    { key: 'shape', text: 'Quelle forme vous attire le plus ?', options: ['Carrée', 'Ronde', 'Papillon'] },
+    { key: 'color', text: 'Quelle palette de couleurs ?', options: ['Neutre', 'Vive', 'Bicolore'] }
+  ];
 
-    if (currentGlassesIndex + 1 < glassesImages.length) {
-      setCurrentGlassesIndex(currentGlassesIndex + 1);
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/glasses')
+      .then(({ data }) => {
+        const list = data.slice(0, 5).map(item => ({ id: item.id, src: item.imageUrl, name: item.name }));
+        setGlasses(list);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const total = glasses.length;
+  const top = glasses[currentIndex];
+
+  const onChoose = (dir, id) => {
+    setLastDir(dir);
+    setLikedMap(prev => ({ ...prev, [id]: dir === 'right' }));
+    setTimeout(() => {
+      if (currentIndex < total - 1) {
+        setCurrentIndex(i => i + 1);
+      } else {
+        setPhase('questions');
+      }
+      setLastDir(null);
+    }, 500);
+  };
+
+  const onAnswer = (key, value) => {
+    setAnswers(prev => ({ ...prev, [key]: value }));
+    if (questionIndex < questions.length - 1) {
+      setTimeout(() => setQuestionIndex(i => i + 1), 400);
     } else {
-      setCurrentStep('questions');
+      setShowFinish(true);
     }
   };
 
-  // Gestion choix question
-  const currentQuestion = questions[currentQuestionIndex];
-  const selectedChoice = answers[currentQuestion?.id];
-
-  const selectChoice = (choiceId) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: choiceId,
-    }));
-  };
-
-  const nextQuestion = () => {
-    if (!selectedChoice) return;
-    if (currentQuestionIndex + 1 < questions.length) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
-  const handleSubmit = () => {
-    console.log('Choix lunettes:', likedGlasses);
-    console.log('Réponses questions:', answers);
-    alert('Merci pour vos réponses !');
-  };
+  if (loading) return <PageContainer><Title>Chargement…</Title></PageContainer>;
 
   return (
     <PageContainer>
-      {currentStep === 'swipe' && (
+      <Title>Choisissez vos lunettes</Title>
+
+      {phase === 'cards' && (
         <>
-          <Title>Étape 1 : Évaluez ces lunettes</Title>
-          <Image
-            src={`/${glassesImages[currentGlassesIndex]}`}
-            alt="Lunettes"
-            onError={e => {
-              e.target.onerror = null;
-              e.target.src =
-                'https://via.placeholder.com/300x400.png?text=Lunettes';
-            }}
-          />
-          <ButtonsContainer>
-            <Button like={false} onClick={() => handleGlassesChoice(false)}>
-              J’aime pas
-            </Button>
-            <Button like={true} onClick={() => handleGlassesChoice(true)}>
-              J’aime
-            </Button>
-          </ButtonsContainer>
-          <p>
-            {currentGlassesIndex + 1} / {glassesImages.length}
-          </p>
+          <Instructions>Sélectionnez chaque modèle !</Instructions>
+          <Counter>{currentIndex + 1} / {total}</Counter>
+
+          <SwipeContainer>
+            <AnimatePresence>
+              {top && (
+                <motion.div
+                  key={top.id}
+                  variants={cardVariants}
+                  initial="initial"
+                  animate="initial"
+                  exit={lastDir === 'right' ? 'liked' : 'disliked'}
+                  transition={{ duration: 0.4 }}>
+                  <Card>
+                    <CardImage src={top.src} alt={top.name} />
+                    <CardLabel>{top.name}</CardLabel>
+                    <ButtonOverlay>
+                      <ConfirmButton onClick={() => onChoose('disliked', top.id)}>👎</ConfirmButton>
+                      <ConfirmButton positive onClick={() => onChoose('liked', top.id)}>👍</ConfirmButton>
+                    </ButtonOverlay>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </SwipeContainer>
         </>
       )}
 
-      {currentStep === 'questions' && (
-        <>
-          <Title>Étape 2 : Question {currentQuestionIndex + 1} / {questions.length}</Title>
-          <QuestionTitle>{currentQuestion.question}</QuestionTitle>
-          <ChoicesContainer>
-            {currentQuestion.choices.map((choice) => (
-              <ChoiceButton
-                key={choice.id}
-                selected={selectedChoice === choice.id}
-                onClick={() => selectChoice(choice.id)}
-              >
-                <span style={{ fontSize: '3rem' }}>{choice.emoji}</span>
-                {choice.label}
-              </ChoiceButton>
-            ))}
-          </ChoicesContainer>
+      {phase === 'questions' && !showFinish && (
+        <QuestionContainer>
+          <AnimatePresence exitBeforeEnter>
+            <motion.div
+              key={questionIndex}
+              variants={questionVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              transition={{ duration: 0.4 }}>
+              <QuestionText>{questions[questionIndex].text}</QuestionText>
+              {questions[questionIndex].options.map(opt => (
+                <OptionButton key={opt} onClick={() => onAnswer(questions[questionIndex].key, opt)}>
+                  {opt}
+                </OptionButton>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </QuestionContainer>
+      )}
 
-          {!isLastQuestion && (
-            <NextButton onClick={nextQuestion} disabled={!selectedChoice}>
-              Suivant
-            </NextButton>
-          )}
-          {isLastQuestion && selectedChoice && (
-            <NextButton onClick={handleSubmit}>Valider</NextButton>
-          )}
-        </>
+      {showFinish && (
+        <FinishContainer>
+          <FinishButton onClick={() => navigate('/result', { state: { likedMap, answers } })}>
+            Voir les résultats
+          </FinishButton>
+        </FinishContainer>
       )}
     </PageContainer>
   );
-};
-
-export default QuizPage;
-
-
-
+}
 
