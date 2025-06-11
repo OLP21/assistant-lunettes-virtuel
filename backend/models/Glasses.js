@@ -1,6 +1,6 @@
-// server/models/Glasses.js
+// backend/models/Glasses.js
 
-// server/models/Glasses.js
+// backend/models/Glasses.js
 const mongoose = require('mongoose');
 
 const GlassesSchema = new mongoose.Schema({
