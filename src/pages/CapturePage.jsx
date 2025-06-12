@@ -37,30 +37,49 @@ const CapturePage = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  // Image + loaded flag
   const overlayImg = useRef(new Image());
-  const loggedOnce = useRef(false);
+  const [glassesReady, setGlassesReady] = useState(false);
+
+  // Refs to hold the latest state for callbacks
+  const selectedGlassesRef = useRef(null);
+  const glassesReadyRef = useRef(false);
   const lastFaceLandmarksRef = useRef(null);
 
+  // Local state
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [selectedGlasses, setSelectedGlasses] = useState(null);
   const [error, setError] = useState(null);
   const [faceShape, setFaceShape] = useState(null);
 
+  // Sync refs with state
   useEffect(() => {
-    if (selectedGlasses) {
-      overlayImg.current.src = selectedGlasses.imageUrl;
-      overlayImg.current.onload = () => {
-        console.log("Glasses image loaded");
-      };
+    selectedGlassesRef.current = selectedGlasses;
+  }, [selectedGlasses]);
+  useEffect(() => {
+    glassesReadyRef.current = glassesReady;
+  }, [glassesReady]);
+
+  // Preload selected glasses image
+  useEffect(() => {
+    if (!selectedGlasses) {
+      setGlassesReady(false);
+      return;
     }
+    setGlassesReady(false);
+    overlayImg.current.onload = () => setGlassesReady(true);
+    overlayImg.current.src = selectedGlasses.imageUrl;
   }, [selectedGlasses]);
 
+  // Camera + FaceMesh setup
   useEffect(() => {
     if (!isCameraActive) return;
 
     let camera;
     const faceMesh = new FaceMesh({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
     });
 
     faceMesh.setOptions({
@@ -70,30 +89,7 @@ const CapturePage = () => {
       minTrackingConfidence: 0.5,
     });
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(() => {
-        faceMesh.onResults(onResults);
-        setTimeout(() => {
-          if (!videoRef.current) {
-            setError("Impossible de démarrer la webcam. Essayez de recharger la page.");
-            return;
-          }
-          camera = new Camera(videoRef.current, {
-            onFrame: async () => {
-              await faceMesh.send({ image: videoRef.current });
-            },
-            width: 640,
-            height: 480,
-          });
-          camera.start();
-        }, 200);
-      })
-      .catch((error) => {
-        setError("Impossible d'accéder à la webcam, veuillez vérifier vos permissions.");
-        setIsCameraActive(false);
-      });
-
-    function onResults(results) {
+    faceMesh.onResults((results) => {
       if (!canvasRef.current || !results.multiFaceLandmarks) return;
 
       const canvas = canvasRef.current;
@@ -101,104 +97,116 @@ const CapturePage = () => {
       canvas.width = videoRef.current.videoWidth || 640;
       canvas.height = videoRef.current.videoHeight || 480;
 
+      // Draw camera frame
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
-      if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-        const landmarks = results.multiFaceLandmarks[0];
-        lastFaceLandmarksRef.current = landmarks;
+      // Save landmarks for shape detection
+      const landmarks = results.multiFaceLandmarks[0];
+      lastFaceLandmarksRef.current = landmarks;
+
+      // Draw glasses if selected and loaded
+      if (selectedGlassesRef.current && glassesReadyRef.current) {
+        const leftTemple = landmarks[234];
+        const rightTemple = landmarks[454];
+        const dx = rightTemple.x - leftTemple.x;
+        const dy = rightTemple.y - leftTemple.y;
+        const distance = Math.hypot(
+          dx * canvas.width,
+          dy * canvas.height
+        );
+        const angle = Math.atan2(dy, dx);
 
         const leftEye = landmarks[33];
         const rightEye = landmarks[263];
-        const leftTemple = landmarks[234];
-        const rightTemple = landmarks[454];
-
-        const dx = rightTemple.x - leftTemple.x;
-        const dy = rightTemple.y - leftTemple.y;
-        const distance = Math.sqrt(dx * dx + dy * dy) * canvas.width;
-        const angle = Math.atan2(dy, dx);
-
         const nose = landmarks[168];
-        const centerX = (leftTemple.x + rightTemple.x) / 2 * canvas.width;
-        const centerY = (leftEye.y + rightEye.y + nose.y) / 3 * canvas.height;
+        const centerX =
+          ((leftTemple.x + rightTemple.x) / 2) * canvas.width;
+        const centerY =
+          ((leftEye.y + rightEye.y + nose.y) / 3) * canvas.height;
 
-        if (selectedGlasses) {
-          const glassesWidth = distance * 1.3;
-          const aspectRatio = overlayImg.current.height / overlayImg.current.width;
-          const glassesHeight = glassesWidth * aspectRatio;
+        const glassesWidth = distance * 1.3;
+        const img = overlayImg.current;
+        const aspectRatio = img.naturalHeight / img.naturalWidth;
+        const glassesHeight = glassesWidth * aspectRatio;
 
-          ctx.save();
-          ctx.translate(centerX, centerY);
-          ctx.rotate(angle);
-          ctx.globalAlpha = 0.65;
-          ctx.drawImage(
-            overlayImg.current,
-            -glassesWidth / 2,
-            -glassesHeight / 2,
-            glassesWidth,
-            glassesHeight
-          );
-          ctx.restore();
-        }
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+        ctx.globalAlpha = 0.65;
+        ctx.drawImage(
+          img,
+          -glassesWidth / 2,
+          -glassesHeight / 2,
+          glassesWidth,
+          glassesHeight
+        );
+        ctx.restore();
       }
+    });
+
+    // Start the MediaPipe camera
+    const videoEl = videoRef.current;
+    if (!videoEl) {
+      setError("Le composant vidéo n'est pas prêt.");
+      return;
     }
+    camera = new Camera(videoEl, {
+      onFrame: async () => {
+        await faceMesh.send({ image: videoEl });
+      },
+      width: 640,
+      height: 480,
+    });
+    camera.start();
 
     return () => {
       if (camera) camera.stop();
       faceMesh.close();
     };
-  }, [isCameraActive, selectedGlasses]);
+  }, [isCameraActive]);
 
+  // Face-shape detection
   const detectFaceShape = () => {
-    if (!lastFaceLandmarksRef.current) {
-      setError("Aucun visage détecté pour le moment.");
+    if (!isCameraActive) {
+      setError("Veuillez activer la webcam avant de détecter la forme du visage.");
       return;
     }
 
     const landmarks = lastFaceLandmarksRef.current;
-    const canvasWidth = canvasRef.current.width;
-    const canvasHeight = canvasRef.current.height;
+    if (!landmarks) {
+      setError("Aucun visage détecté pour le moment. Essayez de rester face à la webcam.");
+      return;
+    }
 
-    const leftForehead = landmarks[70];
-    const rightForehead = landmarks[300];
-    const leftCheekbone = landmarks[234];
-    const rightCheekbone = landmarks[454];
-    const leftJaw = landmarks[127];
-    const rightJaw = landmarks[356];
-    const chin = landmarks[152];
-    const topForehead = landmarks[10];
+    // Clear previous errors
+    setError(null);
 
-    const foreheadWidth = Math.abs((rightForehead.x - leftForehead.x) * canvasWidth);
-    const cheekboneWidth = Math.abs((rightCheekbone.x - leftCheekbone.x) * canvasWidth);
-    const jawWidth = Math.abs((rightJaw.x - leftJaw.x) * canvasWidth);
-    const faceHeight = Math.abs((topForehead.y - chin.y) * canvasHeight);
+    const cw = canvasRef.current.width;
+    const ch = canvasRef.current.height;
+    const lf = landmarks[70],
+      rf = landmarks[300],
+      lc = landmarks[234],
+      rc = landmarks[454],
+      lj = landmarks[127],
+      rj = landmarks[356],
+      chin = landmarks[152],
+      top = landmarks[10];
+
+    const fw = Math.abs((rf.x - lf.x) * cw);
+    const cb = Math.abs((rc.x - lc.x) * cw);
+    const jw = Math.abs((rj.x - lj.x) * cw);
+    const fh = Math.abs((top.y - chin.y) * ch);
 
     let shape = 'Indéterminé';
-
-    if (
-      Math.abs(foreheadWidth - cheekboneWidth) < 15 &&
-      Math.abs(cheekboneWidth - jawWidth) < 15
-    ) {
-      if (faceHeight / cheekboneWidth > 1.5) {
-        shape = "Oblong";
-      } else {
-        shape = "Rond";
-      }
-    } else if (
-      cheekboneWidth > foreheadWidth &&
-      cheekboneWidth > jawWidth
-    ) {
-      shape = "Ovale";
-    } else if (
-      jawWidth >= cheekboneWidth &&
-      jawWidth > foreheadWidth
-    ) {
-      shape = "Carré";
-    } else if (
-      foreheadWidth > cheekboneWidth &&
-      foreheadWidth > jawWidth
-    ) {
-      shape = "Triangle inversé";
+    if (Math.abs(fw - cb) < 0.1 * cb && Math.abs(cb - jw) < 0.1 * cb) {
+      shape = fh / cb > 1.5 ? 'Oblong' : 'Rond';
+    } else if (cb > fw && cb > jw) {
+      shape = 'Ovale';
+    } else if (jw >= cb && jw > fw) {
+      shape = 'Carré';
+    } else if (fw > cb && fw > jw) {
+      shape = 'Triangle inversé';
     }
 
     setFaceShape(shape);
@@ -214,28 +222,32 @@ const CapturePage = () => {
         </PlaceholderText>
       )}
 
-      {!isCameraActive && !error && (
+      {!isCameraActive && (
         <>
           <PlaceholderText>
             Active ta webcam pour commencer l'analyse du visage
           </PlaceholderText>
-          <Button variant="primary" onClick={() => setIsCameraActive(true)}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setError(null);
+              setIsCameraActive(true);
+            }}
+          >
             Activer la webcam
           </Button>
         </>
       )}
 
-      <video
-        ref={videoRef}
-        style={{ display: 'none' }}
-        playsInline
-      >
-        Votre navigateur ne supporte pas l'élément vidéo.
-      </video>
+      <video ref={videoRef} style={{ display: 'none' }} playsInline />
 
       <Canvas ref={canvasRef} />
 
-      <Button variant="secondary" onClick={detectFaceShape}>
+      <Button
+        variant="secondary"
+        onClick={detectFaceShape}
+        disabled={!isCameraActive}
+      >
         Détecter la forme du visage
       </Button>
 
