@@ -1,9 +1,12 @@
  //src/App.jsx
+import Header from './components/Layout/Header'
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { GlobalStyle } from './styles/GlobalStyle'; // Assure-toi que ce fichier existera
 import { theme } from './styles/theme';           // Assure-toi que ce fichier existera
+
+
 
 import MainLayout from './components/Layout/MainLayout'; // Assure-toi que ce fichier existera
 import HomePage from './pages/HomePage';                 // Assure-toi que ce fichier existera
@@ -19,6 +22,7 @@ function App() {
       <Router>
         <MainLayout> {/* Header et Footer potentiels ici */}
           <Routes>
+          <Route path="/header-preview" element={<><Header /><div style={{height: '200px'}}/></>} />
             <Route path="/" element={<HomePage />} />
             <Route path="/start-analysis" element={<CapturePage />} />
             <Route path="/preferences-quiz" element={<QuizPage />} />
