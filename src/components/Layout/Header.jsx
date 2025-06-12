@@ -63,12 +63,12 @@ export default function Header() {
           )}
           {user
             ? <>
-                <StyledLink to="/profile">Mon Profil</StyledLink>
-                <AuthButton onClick={logout}>Déconnexion</AuthButton>
+                <StyledLink to="/Profile">Mon Profil</StyledLink>
+                <Button onClick={logout}>Déconnexion</Button>
               </>
             : <>
-                <AuthButton variant="primary" as={Link} to="/register">Inscription</AuthButton>
-                <Button to="/login">Connexion</Button>
+                <AuthButton variant="primary" as={Link} to="/Register">Inscription</AuthButton>
+                <Button as={Link} to="/Login">Connexion</Button>
               </>
           }
         </DesktopLinks>
@@ -106,13 +106,14 @@ export default function Header() {
               <AuthButton
                 variant="primary"
                 as={Link}
-                to="/register"
+                to="/Register"
                 onClick={() => setMobileOpen(false)}
               >
                 Inscription
               </AuthButton>
+
               <StyledLink
-                to="/login"
+                to="/Login"
                 onClick={() => setMobileOpen(false)}
                 style={{ display:'block', margin:'0.75rem 0' }}
               >
