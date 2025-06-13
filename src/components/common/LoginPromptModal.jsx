@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+// ... (Overlay, Modal, Title, Text, ButtonRow styles are unchanged)
 const Overlay = styled.div`
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -38,16 +39,21 @@ const ButtonRow = styled.div`
   gap: 1rem;
 `;
 
+
 const Button = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  border: none;
+  border: 1px solid transparent; /* Added for consistency */
   cursor: pointer;
   font-weight: bold;
-  background: ${({ primary }) => (primary ? '#007bff' : '#ddd')};
-  color: ${({ primary }) => (primary ? 'white' : 'black')};
+  
+  /* UPDATED: Buttons now use the theme colors */
+  background: ${({ primary, theme }) => (primary ? theme.colors.primary : theme.colors.surface)};
+  color: ${({ primary, theme }) => (primary ? theme.colors.background : theme.colors.text)};
+  border-color: ${({ primary, theme }) => (primary ? 'transparent' : theme.colors.border)};
+
   &:hover {
-    background: ${({ primary }) => (primary ? '#0056b3' : '#ccc')};
+    background: ${({ primary, theme }) => (primary ? theme.colors.secondary : theme.colors.border)};
   }
 `;
 

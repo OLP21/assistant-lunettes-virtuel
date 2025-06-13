@@ -1,5 +1,3 @@
-// src/components/GlassesGallery.jsx
-
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -8,6 +6,10 @@ import { toast } from 'react-toastify';
 
 const GalleryContainer = styled.div`
   margin-top: 2rem;
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
 const Title = styled.h3`
@@ -24,6 +26,13 @@ const Grid = styled.div`
 const GlassItem = styled.div`
   text-align: center;
   cursor: pointer;
+  
+  /* Add styles for active state feedback */
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 0.5rem;
+  transition: border-color 0.2s ease-in-out;
+  border-color: ${props => props.isActive ? props.theme.colors.primary : 'transparent'};
 `;
 
 const GlassImage = styled.img`
@@ -63,7 +72,7 @@ const LikeButton = styled.button`
   }
 `;
 
-const GlassesGallery = ({ onSelect }) => {
+const GlassesGallery = ({ onSelect, activeGlasses }) => { /* Accept activeGlasses prop */
   const [glasses, setGlasses] = useState([]);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
@@ -98,7 +107,11 @@ const GlassesGallery = ({ onSelect }) => {
       <Title>Galerie de lunettes</Title>
       <Grid>
         {glasses.map(glass => (
-          <GlassItem key={glass._id}>
+          <GlassItem 
+            key={glass._id} 
+            /* Apply isActive prop if the current glass matches the active one */
+            isActive={activeGlasses && activeGlasses._id === glass._id}
+          >
             <GlassImage
               src={glass.imageUrl}
               alt={glass.code}

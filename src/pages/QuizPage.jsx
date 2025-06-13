@@ -24,6 +24,9 @@ const questionVariants = {
 // --- STYLES ---
 const PageContainer = styled.div`
   padding: 2rem;
+  /* THIS IS THE FIX: Same as before, make space for the fixed header */
+  padding-top: 6rem;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -155,6 +158,7 @@ const FinishButton = styled.button`
   cursor: pointer;
 `;
 
+
 export default function QuizPage() {
   const [glasses, setGlasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -247,7 +251,7 @@ export default function QuizPage() {
 
       {phase === 'questions' && !showFinish && (
         <QuestionContainer>
-          <AnimatePresence exitBeforeEnter>
+          <AnimatePresence mode="wait">
             <motion.div
               key={questionIndex}
               variants={questionVariants}
@@ -276,4 +280,3 @@ export default function QuizPage() {
     </PageContainer>
   );
 }
-

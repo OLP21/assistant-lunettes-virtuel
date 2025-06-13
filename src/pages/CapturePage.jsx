@@ -1,177 +1,159 @@
-// Enhanced version of CapturePage.jsx with improved face shape detection logic
-
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
-import Button from '../components/common/Button';
-import { FaceMesh } from '@mediapipe/face_mesh';
-import { Camera } from '@mediapipe/camera_utils';
-import GlassesGallery from '../components/GlassesGallery';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+import LiveView from '../components/LiveView';
+import FrameSelector from '../components/FrameSelector';
+import InfoPanel from '../components/InfoPanel';
 import PageNavigation from '../components/common/PageNavigation';
+import LoginPromptModal from '../components/common/LoginPromptModal';
 
 const PageContainer = styled.div`
-  padding: ${({ theme }) => theme.spacing.xl};
-  text-align: center;
-  min-height: calc(100vh - 100px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 300px 1fr 300px;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 6rem 2rem 2rem 2rem;
+  min-height: 100vh;
 `;
 
-const Title = styled.h2`
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-`;
-
-const PlaceholderText = styled.p`
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  font-size: 1.1rem;
-`;
-
-const Canvas = styled.canvas`
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  margin-top: ${({ theme }) => theme.spacing.md};
+const StickyColumn = styled.div`
+  position: sticky;
+  top: 7rem; 
+  align-self: start; 
 `;
 
 const CapturePage = () => {
-  const navigate = useNavigate();
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const overlayImg = useRef(new Image());
-  const [glassesReady, setGlassesReady] = useState(false);
-  const selectedGlassesRef = useRef(null);
-  const glassesReadyRef = useRef(false);
-  const lastFaceLandmarksRef = useRef(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [allGlasses, setAllGlasses] = useState([]);
   const [selectedGlasses, setSelectedGlasses] = useState(null);
-  const [error, setError] = useState(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [faceShape, setFaceShape] = useState(null);
 
-  useEffect(() => { selectedGlassesRef.current = selectedGlasses; }, [selectedGlasses]);
-  useEffect(() => { glassesReadyRef.current = glassesReady; }, [glassesReady]);
+  const landmarksRef = useRef(null);
 
   useEffect(() => {
-    if (!selectedGlasses) return setGlassesReady(false);
-    setGlassesReady(false);
-    overlayImg.current.onload = () => setGlassesReady(true);
-    overlayImg.current.src = selectedGlasses.imageUrl;
-  }, [selectedGlasses]);
+    axios.get('http://localhost:5000/api/glasses')
+      .then(res => setAllGlasses(res.data))
+      .catch((err) => console.error('Failed to load glasses:', err));
+  }, []);
 
-  useEffect(() => {
-    if (!isCameraActive) return;
-    let camera;
-    const faceMesh = new FaceMesh({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-    });
+  const handleLandmarksUpdate = (landmarks) => {
+    landmarksRef.current = landmarks;
+  };
 
-    faceMesh.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5
-    });
+  const handleFavorite = async (glassesId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    try {
+      await axios.post(
+        'http://localhost:5000/api/user/favorites',
+        { glassesId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Ajouté aux favoris !");
+    } catch (err) {
+      toast.error("Erreur lors de l'ajout aux favoris.");
+    }
+  };
 
-    faceMesh.onResults((results) => {
-      if (!canvasRef.current || !results.multiFaceLandmarks) return;
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      canvas.width = videoRef.current.videoWidth || 640;
-      canvas.height = videoRef.current.videoHeight || 480;
+  const handleDetectShape = () => {
+    if (!landmarksRef.current) {
+      toast.error("Veuillez vous placer devant la webcam.");
+      return;
+    }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-      const landmarks = results.multiFaceLandmarks[0];
-      lastFaceLandmarksRef.current = landmarks;
+    const landmarks = landmarksRef.current;
+    
+    // --- NEW, MORE ROBUST FACE SHAPE LOGIC ---
 
-      if (selectedGlassesRef.current && glassesReadyRef.current) {
-        const leftTemple = landmarks[234], rightTemple = landmarks[454];
-        const dx = rightTemple.x - leftTemple.x;
-        const dy = rightTemple.y - leftTemple.y;
-        const distance = Math.hypot(dx * canvas.width, dy * canvas.height);
-        const angle = Math.atan2(dy, dx);
-        const leftEye = landmarks[33], rightEye = landmarks[263], nose = landmarks[168];
-        const centerX = ((leftTemple.x + rightTemple.x) / 2) * canvas.width;
-        const centerY = ((leftEye.y + rightEye.y + nose.y) / 3) * canvas.height;
-        const glassesWidth = distance * 1.3;
-        const img = overlayImg.current;
-        const aspectRatio = img.naturalHeight / img.naturalWidth;
-        const glassesHeight = glassesWidth * aspectRatio;
-
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(angle);
-        ctx.globalAlpha = 0.65;
-        ctx.drawImage(img, -glassesWidth / 2, -glassesHeight / 2, glassesWidth, glassesHeight);
-        ctx.restore();
-      }
-    });
-
-    const videoEl = videoRef.current;
-    if (!videoEl) return setError("Le composant vidéo n'est pas prêt.");
-    camera = new Camera(videoEl, {
-      onFrame: async () => await faceMesh.send({ image: videoEl }),
-      width: 640,
-      height: 480
-    });
-    camera.start();
-    return () => { if (camera) camera.stop(); faceMesh.close(); };
-  }, [isCameraActive]);
-
-  const detectFaceShape = () => {
-    if (!isCameraActive) return setError("Veuillez activer la webcam avant de détecter la forme du visage.");
-    const landmarks = lastFaceLandmarksRef.current;
-    if (!landmarks) return setError("Aucun visage détecté pour le moment. Essayez de rester face à la webcam.");
-    setError(null);
-
-    const cw = canvasRef.current.width;
-    const ch = canvasRef.current.height;
-
-    const top = landmarks[10];
+    // 1. Define all necessary landmark points
+    const foreheadLeft = landmarks[103];
+    const foreheadRight = landmarks[332];
+    const cheekLeft = landmarks[234];
+    const cheekRight = landmarks[454];
+    const jawLeft = landmarks[127];
+    const jawRight = landmarks[356];
     const chin = landmarks[152];
-    const leftCheek = landmarks[234];
-    const rightCheek = landmarks[454];
-    const leftJaw = landmarks[127];
-    const rightJaw = landmarks[356];
-    const leftForehead = landmarks[70];
-    const rightForehead = landmarks[300];
+    const faceTop = landmarks[10];
 
-    const faceHeight = Math.abs((top.y - chin.y) * ch);
-    const cheekWidth = Math.abs((rightCheek.x - leftCheek.x) * cw);
-    const jawWidth = Math.abs((rightJaw.x - leftJaw.x) * cw);
-    const foreheadWidth = Math.abs((rightForehead.x - leftForehead.x) * cw);
+    // Helper function to calculate distance between two 3D points
+    const getDistance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
 
-    const verticalRatio = faceHeight / cheekWidth;
-    const cheekToJawRatio = cheekWidth / jawWidth;
-    const cheekToForeheadRatio = cheekWidth / foreheadWidth;
+    // 2. Calculate the four key facial dimensions
+    const faceLength = getDistance(faceTop, chin);
+    const foreheadWidth = getDistance(foreheadLeft, foreheadRight);
+    const cheekWidth = getDistance(cheekLeft, cheekRight); // This will be the widest part for most faces
+    const jawlineWidth = getDistance(jawLeft, jawRight);
 
     let shape = 'Indéterminé';
-    if (verticalRatio > 1.5 && cheekToJawRatio > 1.1) shape = 'Oblong';
-    else if (Math.abs(cheekToJawRatio - 1) < 0.1 && Math.abs(cheekToForeheadRatio - 1) < 0.1) shape = 'Rond';
-    else if (cheekToJawRatio < 0.9 && cheekToForeheadRatio < 0.9) shape = 'Carré';
-    else if (cheekToForeheadRatio > 1.2) shape = 'Triangle inversé';
-    else if (verticalRatio > 1.2 && cheekToJawRatio < 1) shape = 'Ovale';
 
+    // 3. Apply a more detailed set of rules based on proportions
+    
+    // Rule for Oblong: Face is noticeably longer than it is wide.
+    if (faceLength > cheekWidth * 1.25) {
+      shape = 'Oblong';
+    }
+    // Rule for Round: Face length and width are very similar, with a soft jawline.
+    else if (Math.abs(faceLength - cheekWidth) / cheekWidth < 0.1 && jawlineWidth < foreheadWidth) {
+      shape = 'Rond';
+    }
+    // Rule for Square: Face length and width are similar, but jaw and forehead are wide.
+    else if (Math.abs(faceLength - cheekWidth) / cheekWidth < 0.1 && Math.abs(jawlineWidth - cheekWidth) / cheekWidth < 0.1) {
+      shape = 'Carré';
+    }
+    // Rule for Heart: Forehead is wider than the jawline, face tapers to a smaller chin.
+    else if (foreheadWidth > jawlineWidth && cheekWidth > jawlineWidth) {
+      shape = 'En cœur';
+    }
+    // Rule for Triangle: Jawline is wider than the forehead.
+    else if (jawlineWidth > foreheadWidth) {
+        shape = 'Triangle';
+    }
+    // Default to Oval: If it doesn't fit the other specific rules, it's likely oval.
+    else {
+      shape = 'Ovale';
+    }
+    
     setFaceShape(shape);
+    toast.success(`Forme du visage détectée : ${shape}`);
   };
 
   return (
-    <PageContainer>
-      <Title>Étape 1: Essayage en Direct</Title>
-      {error && <PlaceholderText style={{ color: 'red' }}>{error}</PlaceholderText>}
-      {!isCameraActive && (
-        <>
-          <PlaceholderText>Active ta webcam pour commencer l'analyse du visage</PlaceholderText>
-          <Button variant="primary" onClick={() => { setError(null); setIsCameraActive(true); }}>Activer la webcam</Button>
-        </>
-      )}
-      <video ref={videoRef} style={{ display: 'none' }} playsInline />
-      <Canvas ref={canvasRef} />
-      <Button variant="secondary" onClick={detectFaceShape} disabled={!isCameraActive}>Détecter la forme du visage</Button>
-      {faceShape && <PlaceholderText>Forme du visage détectée : <strong>{faceShape}</strong></PlaceholderText>}
-      <GlassesGallery onSelect={setSelectedGlasses} />
+    <>
+      <PageContainer>
+        <StickyColumn>
+          <FrameSelector frames={allGlasses} onSelect={setSelectedGlasses} />
+        </StickyColumn>
+        
+        <LiveView 
+          selectedGlasses={selectedGlasses}
+          isCameraActive={isCameraActive}
+          onActivateCamera={() => setIsCameraActive(true)}
+          onLandmarksUpdate={handleLandmarksUpdate}
+        />
+        
+        <StickyColumn>
+          <InfoPanel 
+            selectedFrame={selectedGlasses}
+            onFavorite={handleFavorite}
+            onDetectShape={handleDetectShape}
+            faceShape={faceShape}
+          />
+        </StickyColumn>
+      </PageContainer>
       <PageNavigation previous="/" next="/preferences-quiz" />
-    </PageContainer>
+
+      {showLoginPrompt && (
+        <LoginPromptModal onCancel={() => setShowLoginPrompt(false)} />
+      )}
+    </>
   );
 };
 
