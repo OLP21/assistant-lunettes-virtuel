@@ -1,14 +1,14 @@
 // src/components/Layout/Header.jsx
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components'; // Import the 'css' helper
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
-// import SVGs as URLs
 import loginIconUrl from '../../assets/icons/login.svg';
 import registerIconUrl from '../../assets/icons/register.svg';
 
+// ... (HeaderBar, Nav, Logo, etc. are unchanged)
 const HeaderBar = styled.header`
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -44,7 +44,6 @@ const StyledLink = styled(Link)`
   &:hover { color: ${({ theme }) => theme.colors.primary}; }
 `;
 
-/* Always-visible hamburger button */
 const MenuToggle = styled.button`
   background: none;
   border: none;
@@ -53,7 +52,6 @@ const MenuToggle = styled.button`
   svg { width: 24px; height: 24px; }
 `;
 
-/* Dropdown container */
 const MenuDropdown = styled.div`
   position: absolute;
   top: calc(100% + 4px);
@@ -66,29 +64,44 @@ const MenuDropdown = styled.div`
   overflow: hidden;
 `;
 
-/* Header inside dropdown for the close icon */
 const DropdownHeader = styled.div`
   display: flex;
   justify-content: flex-end;
   padding: 0.5rem;
-  
-  svg {
-    width: 20px;
-    height: 20px;
-  }
+  svg { width: 20px; height: 20px; }
 `;
 
-/* Each link item: icon + text, inline */
-const DropdownItem = styled(Link)`
+/* --- REFACTORED THIS SECTION --- */
+
+// 1. Create a reusable block of styles
+const dropdownItemStyles = css`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   color: #333;
-  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  
   &:hover {
     background: ${({ theme }) => theme.colors.surface};
   }
+`;
+
+// 2. Create an explicit component for LINKS
+const DropdownLink = styled(Link)`
+  ${dropdownItemStyles}
+  text-decoration: none;
+`;
+
+// 3. Create an explicit component for BUTTONS
+const DropdownButton = styled.button`
+  ${dropdownItemStyles}
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
 `;
 
 const IconImg = styled.img`
@@ -108,17 +121,13 @@ export default function Header() {
   return (
     <HeaderBar>
       <Nav>
-        {/* Logo */}
+        {/* ... (Logo, CenterLinks, MenuToggle are unchanged) ... */}
         <Logo to="/"><img src="/logo.png" alt="Vision AI logo" /></Logo>
-
-        {/* Center (desktop only) */}
         <CenterLinks>
           {navLinks.map(([label,to]) => (
             <StyledLink key={to} to={to}>{label}</StyledLink>
           ))}
         </CenterLinks>
-
-        {/* Hamburger: always visible */}
         <MenuToggle
           aria-label="Ouvrir le menu"
           onClick={() => setMenuOpen(open => !open)}
@@ -127,27 +136,21 @@ export default function Header() {
         </MenuToggle>
       </Nav>
 
-      {/* Dropdown with close-X inside */}
       <MenuDropdown open={menuOpen}>
         <DropdownHeader>
           <button
             onClick={() => setMenuOpen(false)}
             aria-label="Fermer le menu"
-            style={{
-              background: 'none',
-              border:     'none',
-              padding:    0,
-              cursor:     'pointer'
-            }}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             <XMarkIcon />
           </button>
         </DropdownHeader>
-
+        
+        {/* --- UPDATED TO USE THE NEW COMPONENTS --- */}
         {user ? (
           <>
-            <DropdownItem
-              as="button"
+            <DropdownButton
               onClick={() => {
                 logout();
                 setMenuOpen(false);
@@ -155,22 +158,23 @@ export default function Header() {
             >
               <IconImg src={loginIconUrl} alt="" />
               Se déconnecter
-            </DropdownItem>
-            <DropdownItem to="/Profile" onClick={() => setMenuOpen(false)}>
+            </DropdownButton>
+            
+            <DropdownLink to="/Profile" onClick={() => setMenuOpen(false)}>
               <IconImg src={registerIconUrl} alt="" />
               Mon Profil
-            </DropdownItem>
+            </DropdownLink>
           </>
         ) : (
           <>
-            <DropdownItem to="/Login" onClick={() => setMenuOpen(false)}>
+            <DropdownLink to="/Login" onClick={() => setMenuOpen(false)}>
               <IconImg src={loginIconUrl} alt="" />
               Connexion
-            </DropdownItem>
-            <DropdownItem to="/Register" onClick={() => setMenuOpen(false)}>
+            </DropdownLink>
+            <DropdownLink to="/Register" onClick={() => setMenuOpen(false)}>
               <IconImg src={registerIconUrl} alt="" />
               Inscription
-            </DropdownItem>
+            </DropdownLink>
           </>
         )}
       </MenuDropdown>

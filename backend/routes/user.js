@@ -57,4 +57,33 @@ router.get('/favorites', authMiddleware, async (req, res) => {
   }
 });
 
+// DELETE /api/user/favorites/:id
+// Remove a pair of glasses from the user's favorites
+router.delete('/favorites/:id', authMiddleware, async (req, res) => {
+    const glassesIdToRemove = req.params.id;
+  
+    try {
+      const user = await User.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+      }
+  
+      // Use $pull to remove the object containing the matching glasses ID
+      // from the favorites array.
+      user.favorites.pull({ glasses: glassesIdToRemove });
+      
+      await user.save();
+      
+      // Send back a success message
+      res.status(200).json({ message: 'Favori supprimé avec succès.' });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Erreur serveur.' });
+    }
+  });
+  
+  module.exports = router;
+
+
 module.exports = router;
