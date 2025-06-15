@@ -272,7 +272,7 @@ export default function QuizPage() {
 
       {showFinish && (
         <FinishContainer>
-          <FinishButton onClick={() => navigate('/result', { state: { likedMap, answers } })}>
+          <FinishButton onClick={() => navigate('/recommendations', { state: { likedMap, answers } })}>
             Voir les résultats
           </FinishButton>
         </FinishContainer>

@@ -38,6 +38,19 @@ assistant-lunettes-virtuel/
 └── package.json
 
 
+## 🐟 Configuration de l'API
+
+Le serveur backend attend une variable d'environnement `OPENAI_API_KEY` pour
+contacter l'API d'OpenAI et générer les recommandations. Créez un fichier `.env`
+dans le répertoire racine et ajoutez votre clé :
+
+```bash
+OPENAI_API_KEY=sk-...
+```
+
+Redémarrez ensuite le serveur backend pour prendre en compte la clé.
+
+
 ## 👥 Membres du projet
 
 - **Teddy** (Frontend & Logiciel IA)
