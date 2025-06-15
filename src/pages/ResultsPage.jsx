@@ -33,6 +33,12 @@ const GlassCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: ${({ theme }) => theme.shadows.strong};
+  }
 `;
 
 const PlaceholderImg = styled.div`
