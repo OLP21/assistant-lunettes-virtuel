@@ -7,6 +7,9 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { quizAnswers, likedGlasses, faceShape } = req.body;
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: 'OPENAI_API_KEY manquant' });
+  }
   try {
     let allGlasses = [];
 

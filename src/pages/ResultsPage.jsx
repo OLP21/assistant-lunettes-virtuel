@@ -29,6 +29,7 @@ const ResultsPage = () => {
   const location = useLocation();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const faceShape = localStorage.getItem('faceShape');
@@ -47,7 +48,10 @@ const ResultsPage = () => {
       faceShape
     })
     .then(res => setRecommendations(res.data))
-    .catch(err => console.error('Recommendation error', err))
+    .catch(err => {
+      console.error('Recommendation error', err);
+      setError('Erreur lors de la récupération des recommandations');
+    })
     .finally(() => setLoading(false));
   }, [location.state]);
 
@@ -56,6 +60,8 @@ const ResultsPage = () => {
       <Title>Votre Sélection Personnalisée</Title>
       {loading ? (
         <PlaceholderText>Chargement des recommandations…</PlaceholderText>
+      ) : error ? (
+        <PlaceholderText>{error}</PlaceholderText>
       ) : recommendations.length === 0 ? (
         <PlaceholderText>Aucune recommandation disponible.</PlaceholderText>
       ) : (
