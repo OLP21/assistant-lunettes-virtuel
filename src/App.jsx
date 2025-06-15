@@ -33,7 +33,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/start-analysis" element={<CapturePage />} />
             <Route path="/preferences-quiz" element={<QuizPage />} />
-            <Route path="/recommendations" element={<ResultsPage />} />
+            <Route path="/results" element={<ResultsPage />} />
             {/* <Route path="*" element={<NotFoundPage />} /> */}
           </Routes>
         </MainLayout>
