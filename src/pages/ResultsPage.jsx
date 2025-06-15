@@ -1,9 +1,7 @@
 // src/pages/ResultsPage.jsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PageNavigation from '../components/common/PageNavigation';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 
 const PageContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
@@ -12,69 +10,67 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */ /* Peut-être pas centré si la liste est longue */
 `;
 
 const Title = styled.h2`
   margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
-const PlaceholderText = styled.p`
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-  font-size: 1.1rem;
+const GlassesGrid = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.lg};
+  margin-top: ${({ theme }) => theme.spacing.lg};
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
-const ResultsPage = () => {
-  const location = useLocation();
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const GlassCard = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 8px;
+  padding: ${({ theme }) => theme.spacing.md};
+  width: 180px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
-  useEffect(() => {
-    const faceShape = localStorage.getItem('faceShape');
-    const { likedMap, answers } = location.state || {};
-    if (!likedMap || !answers) {
-      console.warn('Missing quiz data for recommendations');
-      setLoading(false);
-      return;
-    }
+const PlaceholderImg = styled.div`
+  background: ${({ theme }) => theme.colors.backgroundSecondary};
+  width: 100%;
+  height: 120px;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
 
-    const liked = Object.keys(likedMap).filter(id => likedMap[id]);
+const GlassName = styled.p`
+  font-weight: bold;
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
 
-    axios.post('http://localhost:5000/api/recommend', {
-      quizAnswers: answers,
-      likedGlasses: liked,
-      faceShape
-    })
-    .then(res => setRecommendations(res.data))
-    .catch(err => {
-      console.error('Recommendation error', err);
-      setError('Erreur lors de la récupération des recommandations');
-    })
-    .finally(() => setLoading(false));
-  }, [location.state]);
+const GlassBrand = styled.p`
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
 
-  return (
-    <PageContainer>
-      <Title>Votre Sélection Personnalisée</Title>
-      {loading ? (
-        <PlaceholderText>Chargement des recommandations…</PlaceholderText>
-      ) : error ? (
-        <PlaceholderText>{error}</PlaceholderText>
-      ) : recommendations.length === 0 ? (
-        <PlaceholderText>Aucune recommandation disponible.</PlaceholderText>
-      ) : (
-        recommendations.map(glass => (
-          <div key={glass._id} style={{ marginBottom: '1rem' }}>
-            <img src={glass.imageUrl} alt={glass.name} style={{ maxWidth: '150px' }} />
-            <p>{glass.brand} - {glass.name}</p>
-          </div>
-        ))
-      )}
-      <PageNavigation previous='/preferences-quiz'/>
-    </PageContainer>
-  );
-};
+const placeholderGlasses = [
+  { id: 1, name: 'Modèle Épuré', brand: 'Marque A' },
+  { id: 2, name: 'Style Moderne', brand: 'Marque B' },
+  { id: 3, name: 'Design Classique', brand: 'Marque C' },
+];
+
+const ResultsPage = () => (
+  <PageContainer>
+    <Title>Votre Sélection Personnalisée</Title>
+    <GlassesGrid>
+      {placeholderGlasses.map(glass => (
+        <GlassCard key={glass.id}>
+          <PlaceholderImg />
+          <GlassName>{glass.name}</GlassName>
+          <GlassBrand>{glass.brand}</GlassBrand>
+        </GlassCard>
+      ))}
+    </GlassesGrid>
+    <PageNavigation previous='/preferences-quiz' />
+  </PageContainer>
+);
 
 export default ResultsPage;
