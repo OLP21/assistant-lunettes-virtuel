@@ -53,6 +53,29 @@ Redémarrez ensuite le serveur backend pour prendre en compte la clé.
 Si la clé est absente ou que l'appel à l'API échoue, le serveur renverra
 une erreur.
 
+## 🚀 Installation et lancement
+
+1. **Installer les dépendances**
+
+   ```bash
+   npm install
+   cd backend && npm install
+   ```
+
+2. **Configurer l'API** : copiez `backend/.env` et renseignez `OPENAI_API_KEY`.
+
+3. **Démarrer le backend**
+
+   ```bash
+   npm start
+   ```
+
+4. **Démarrer le frontend** (depuis la racine du projet)
+
+   ```bash
+   npm run dev
+   ```
+
 ## 👥 Membres du projet
 
 - **Teddy** (Frontend & Logiciel IA)

@@ -44,16 +44,12 @@ try{
 
 // Login
 router.post('/login', async (req, res) => {
-    + console.log('[login] body:', req.body);
-    + console.log('[login] JWT_SECRET:', process.env.JWT_SECRET);
     const { email, password} = req.body;
     try{
         const user = await User.findOne({ email });
-        console.log('[login] found user:', user);
         if (!user) return res.status(401).json({ message: 'Identifiants invalides'});
     
         const valid = await bcrypt.compare(password, user.passwordHash);
-        console.log('[login] password valid:', valid);
         if (!valid) return res.status(401).json({ message: 'Identifiants invalides'});
 
         const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET, { expiresIn: '7d'});
