@@ -7,9 +7,6 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { quizAnswers, likedGlasses, faceShape } = req.body;
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OPENAI_API_KEY manquant' });
-  }
   try {
     let allGlasses = [];
 
@@ -24,27 +21,34 @@ router.post('/', async (req, res) => {
       const json = fs.readFileSync(jsonPath, 'utf-8');
       allGlasses = JSON.parse(json);
     }
-    const prompt = `Tu es un assistant qui recommande des montures de lunettes. En te basant sur les réponses au quiz suivantes ${JSON.stringify(quizAnswers)}, sur les modèles aimés ${JSON.stringify(likedGlasses)} et sur la forme du visage ${faceShape}, choisis trois montures parmi cette liste : ${allGlasses.map(g => g.code).join(', ')}. Réponds uniquement par un tableau JSON des codes.`;
+    let recommended = [];
 
-    const { data } = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+    if (process.env.OPENAI_API_KEY) {
+      const prompt = `Tu es un assistant qui recommande des montures de lunettes. En te basant sur les réponses au quiz suivantes ${JSON.stringify(quizAnswers)}, sur les modèles aimés ${JSON.stringify(likedGlasses)} et sur la forme du visage ${faceShape}, choisis trois montures parmi cette liste : ${allGlasses.map(g => g.code).join(', ')}. Réponds uniquement par un tableau JSON des codes.`;
+
+      try {
+        const { data } = await axios.post('https://api.openai.com/v1/chat/completions', {
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+          }
+        });
+
+        const codes = JSON.parse(data.choices[0].message.content);
+        recommended = allGlasses.filter(g => codes.includes(g.code)).slice(0, 3);
+      } catch (err) {
+        console.error('OpenAI request failed, using local recommendation');
       }
-    });
-
-    let codes = [];
-    try {
-      codes = JSON.parse(data.choices[0].message.content);
-    } catch (e) {
-      return res.status(500).json({ error: 'Réponse OpenAI invalide' });
     }
 
-    const recommended = allGlasses.filter(g => codes.includes(g.code)).slice(0, 3);
+    if (recommended.length === 0) {
+      recommended = allGlasses.slice(0, 3);
+    }
+
     res.json(recommended);
   } catch (err) {
     console.error(err);

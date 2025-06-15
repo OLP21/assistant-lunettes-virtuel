@@ -50,6 +50,9 @@ OPENAI_API_KEY=<votre_clé_OpenAI>
 
 Redémarrez ensuite le serveur backend pour prendre en compte la clé.
 
+Si la clé est absente ou que l'appel à l'API échoue, le serveur renverra
+simplement trois montures par défaut issues du catalogue local.
+
 Si vous utilisez MongoDB, importez les données de lunettes avant de démarrer :
 
 ```bash
