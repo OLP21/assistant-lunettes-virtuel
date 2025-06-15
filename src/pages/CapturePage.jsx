@@ -120,8 +120,9 @@ const CapturePage = () => {
     else {
       shape = 'Ovale';
     }
-    
+
     setFaceShape(shape);
+    localStorage.setItem('faceShape', shape);
     toast.success(`Forme du visage détectée : ${shape}`);
   };
 
