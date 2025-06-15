@@ -50,6 +50,14 @@ OPENAI_API_KEY=sk-...
 
 Redémarrez ensuite le serveur backend pour prendre en compte la clé.
 
+Si vous utilisez MongoDB, importez les données de lunettes avant de démarrer :
+
+```bash
+cd backend
+npm run seed
+```
+
+
 
 ## 👥 Membres du projet
 

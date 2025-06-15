@@ -28,11 +28,16 @@ const PlaceholderText = styled.p`
 const ResultsPage = () => {
   const location = useLocation();
   const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const faceShape = localStorage.getItem('faceShape');
     const { likedMap, answers } = location.state || {};
-    if (!likedMap || !answers) return;
+    if (!likedMap || !answers) {
+      console.warn('Missing quiz data for recommendations');
+      setLoading(false);
+      return;
+    }
 
     const liked = Object.keys(likedMap).filter(id => likedMap[id]);
 
@@ -42,13 +47,16 @@ const ResultsPage = () => {
       faceShape
     })
     .then(res => setRecommendations(res.data))
-    .catch(err => console.error('Recommendation error', err));
+    .catch(err => console.error('Recommendation error', err))
+    .finally(() => setLoading(false));
   }, [location.state]);
 
   return (
     <PageContainer>
       <Title>Votre Sélection Personnalisée</Title>
-      {recommendations.length === 0 ? (
+      {loading ? (
+        <PlaceholderText>Chargement des recommandations…</PlaceholderText>
+      ) : recommendations.length === 0 ? (
         <PlaceholderText>Aucune recommandation disponible.</PlaceholderText>
       ) : (
         recommendations.map(glass => (

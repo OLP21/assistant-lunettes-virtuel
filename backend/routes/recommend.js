@@ -1,12 +1,26 @@
 const express = require('express');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const Glasses = require('../models/Glasses');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { quizAnswers, likedGlasses, faceShape } = req.body;
   try {
-    const allGlasses = await Glasses.find();
+    let allGlasses = [];
+
+    try {
+      allGlasses = await Glasses.find();
+    } catch (dbErr) {
+      console.warn('Database unavailable, falling back to JSON data');
+    }
+
+    if (!allGlasses || allGlasses.length === 0) {
+      const jsonPath = path.join(__dirname, '..', '..', 'glassesData.json');
+      const json = fs.readFileSync(jsonPath, 'utf-8');
+      allGlasses = JSON.parse(json);
+    }
     const prompt = `Tu es un assistant qui recommande des montures de lunettes. En te basant sur les réponses au quiz suivantes ${JSON.stringify(quizAnswers)}, sur les modèles aimés ${JSON.stringify(likedGlasses)} et sur la forme du visage ${faceShape}, choisis trois montures parmi cette liste : ${allGlasses.map(g => g.code).join(', ')}. Réponds uniquement par un tableau JSON des codes.`;
 
     const { data } = await axios.post('https://api.openai.com/v1/chat/completions', {
