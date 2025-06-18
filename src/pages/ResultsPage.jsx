@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'; // MODIFIÉ : useEffect a été ajouté
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation, Link } from 'react-router-dom';
 

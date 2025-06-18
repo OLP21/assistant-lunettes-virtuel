@@ -8,6 +8,7 @@ import FrameSelector from '../components/FrameSelector';
 import InfoPanel from '../components/InfoPanel';
 import PageNavigation from '../components/common/PageNavigation';
 import LoginPromptModal from '../components/common/LoginPromptModal';
+import { Link } from 'react-router-dom'; // Assurez-vous que Link est importé si vous l'utilisez
 
 const PageContainer = styled.div`
   display: grid;
@@ -52,11 +53,7 @@ const CapturePage = () => {
       return;
     }
     try {
-      await axios.post(
-        'http://localhost:5000/api/user/favorites',
-        { glassesId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post('http://localhost:5000/api/user/favorites', { glassesId }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Ajouté aux favoris !");
     } catch (err) {
       toast.error("Erreur lors de l'ajout aux favoris.");
@@ -71,52 +68,42 @@ const CapturePage = () => {
 
     const landmarks = landmarksRef.current;
     
-    // --- NEW, MORE ROBUST FACE SHAPE LOGIC ---
+    const getDistance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y); // On utilise la distance 2D pour plus de stabilité
 
-    // 1. Define all necessary landmark points
-    const foreheadLeft = landmarks[103];
-    const foreheadRight = landmarks[332];
-    const cheekLeft = landmarks[234];
-    const cheekRight = landmarks[454];
-    const jawLeft = landmarks[127];
-    const jawRight = landmarks[356];
-    const chin = landmarks[152];
-    const faceTop = landmarks[10];
-
-    // Helper function to calculate distance between two 3D points
-    const getDistance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
-
-    // 2. Calculate the four key facial dimensions
-    const faceLength = getDistance(faceTop, chin);
-    const foreheadWidth = getDistance(foreheadLeft, foreheadRight);
-    const cheekWidth = getDistance(cheekLeft, cheekRight); // This will be the widest part for most faces
-    const jawlineWidth = getDistance(jawLeft, jawRight);
+    // 1. Calculer les 4 dimensions clés
+    const faceLength = getDistance(landmarks[10], landmarks[152]);
+    const foreheadWidth = getDistance(landmarks[54], landmarks[284]);
+    const cheekWidth = getDistance(landmarks[234], landmarks[454]);
+    const jawlineWidth = getDistance(landmarks[172], landmarks[397]);
 
     let shape = 'Indéterminé';
 
-    // 3. Apply a more detailed set of rules based on proportions
+    // 2. Appliquer les règles dans un ordre logique
+    const cheek_jaw_ratio = jawlineWidth / cheekWidth;
+    const cheek_forehead_ratio = foreheadWidth / cheekWidth;
+    const length_cheek_ratio = faceLength / cheekWidth;
     
-    // Rule for Oblong: Face is noticeably longer than it is wide.
-    if (faceLength > cheekWidth * 1.25) {
-      shape = 'Oblong';
-    }
-    // Rule for Round: Face length and width are very similar, with a soft jawline.
-    else if (Math.abs(faceLength - cheekWidth) / cheekWidth < 0.1 && jawlineWidth < foreheadWidth) {
-      shape = 'Rond';
-    }
-    // Rule for Square: Face length and width are similar, but jaw and forehead are wide.
-    else if (Math.abs(faceLength - cheekWidth) / cheekWidth < 0.1 && Math.abs(jawlineWidth - cheekWidth) / cheekWidth < 0.1) {
-      shape = 'Carré';
-    }
-    // Rule for Heart: Forehead is wider than the jawline, face tapers to a smaller chin.
-    else if (foreheadWidth > jawlineWidth && cheekWidth > jawlineWidth) {
+    // Règle 1 : Le visage est-il en Cœur ? (front large, mâchoire étroite)
+    if (cheek_forehead_ratio > 1.05 && cheek_jaw_ratio < 0.95) {
       shape = 'En cœur';
     }
-    // Rule for Triangle: Jawline is wider than the forehead.
-    else if (jawlineWidth > foreheadWidth) {
-        shape = 'Triangle';
+    // Règle 2 : Le visage est-il Rond ou Carré ? (longueur et largeur similaires)
+    else if (length_cheek_ratio < 1.15) { 
+      if (cheek_jaw_ratio > 0.95) {
+        shape = 'Carré'; // Mâchoire presque aussi large que les joues
+      } else {
+        shape = 'Rond'; // Mâchoire plus étroite
+      }
     }
-    // Default to Oval: If it doesn't fit the other specific rules, it's likely oval.
+    // Règle 3 : Le visage est-il en Triangle ? (mâchoire plus large que le front)
+    else if (jawlineWidth > foreheadWidth) {
+      shape = 'Triangle';
+    }
+    // Règle 4 : Le visage est-il Oblong ? (très long ET pas une autre forme)
+    else if (length_cheek_ratio > 1.4) {
+      shape = 'Oblong';
+    }
+    // Règle 5 : Par défaut, c'est un visage Ovale (la forme la plus équilibrée)
     else {
       shape = 'Ovale';
     }
