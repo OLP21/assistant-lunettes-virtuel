@@ -1,0 +1,38 @@
+services:
+  frontend:
+    build: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  backend:
+    build: .
+    ports:
+      - "3001:5000"
+    volumes:
+      - ./server:/app/server
+      - /app/server/node_modules
+    working_dir: /app/server
+    command: npm start
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=glassesApp
+
+volumes:
+  mongodb_data:
+
