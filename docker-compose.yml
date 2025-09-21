@@ -15,12 +15,15 @@ services:
     ports:
       - "3001:5000"
     volumes:
-      - ./server:/app/server
-      - /app/server/node_modules
-    working_dir: /app/server
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    working_dir: /app/backend
     command: npm start
     environment:
       - NODE_ENV=development
+      - MONGO_URI=mongodb://mongodb:27017/glassesApp
+      - JWT_SECRET=Testehehehe766645786
+      - OPENAI_API_KEY=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
     depends_on:
       - mongodb
 

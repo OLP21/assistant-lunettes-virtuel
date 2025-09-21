@@ -103,7 +103,7 @@ export default function Profile() {
   useEffect(() => {
     if (!user) return;
     const token = localStorage.getItem('token');
-    axios.get('http://localhost:5000/api/user/favorites', {
+    axios.get('http://localhost:3001/api/user/favorites', {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => setFavorites(res.data))
@@ -113,7 +113,7 @@ export default function Profile() {
   const handleRemoveFavorite = async (glassId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/user/favorites/${glassId}`, {
+      await axios.delete(`http://localhost:3001/api/user/favorites/${glassId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFavorites(currentFavorites => currentFavorites.filter(fav => fav._id !== glassId));

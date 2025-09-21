@@ -96,7 +96,7 @@ export default function QuizPage() {
       if (!token) return;
 
       try {
-        const res = await axios.get('http://localhost:5000/api/user/favorites', {
+        const res = await axios.get('http://localhost:3001/api/user/favorites', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setFetchedFavorites(res.data);
@@ -149,7 +149,7 @@ export default function QuizPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/ai/recommendations', userDataForAI, {
+      const res = await axios.post('http://localhost:3001/api/ai/recommendations', userDataForAI, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

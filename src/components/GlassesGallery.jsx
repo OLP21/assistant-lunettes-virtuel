@@ -77,7 +77,7 @@ const GlassesGallery = ({ onSelect, activeGlasses }) => { /* Accept activeGlasse
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/glasses')
+    axios.get('http://localhost:3001/api/glasses')
       .then(res => setGlasses(res.data))
       .catch((err) => console.error('Failed to load glasses:', err));
   }, []);
@@ -91,7 +91,7 @@ const GlassesGallery = ({ onSelect, activeGlasses }) => { /* Accept activeGlasse
 
     try {
       await axios.post(
-        'http://localhost:5000/api/user/favorites',
+        'http://localhost:3001/api/user/favorites',
         { glassesId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

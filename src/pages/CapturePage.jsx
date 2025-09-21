@@ -37,7 +37,7 @@ const CapturePage = () => {
   const landmarksRef = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/glasses')
+    axios.get('http://localhost:3001/api/glasses')
       .then(res => setAllGlasses(res.data))
       .catch(err => console.error('Failed to load glasses:', err));
   }, []);
@@ -54,7 +54,7 @@ const CapturePage = () => {
     }
     try {
       await axios.post(
-        'http://localhost:5000/api/user/favorites',
+        'http://localhost:3001/api/user/favorites',
         { glassesId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

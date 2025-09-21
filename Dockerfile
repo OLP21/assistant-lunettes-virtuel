@@ -3,10 +3,10 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-COPY server/package*.json ./server/
+COPY backend/package*.json ./backend/
 
 RUN npm install
-RUN cd server && npm  install
+RUN cd backend && npm install
 
 COPY . .
 
