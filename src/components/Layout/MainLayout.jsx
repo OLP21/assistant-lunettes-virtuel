@@ -1,6 +1,7 @@
 // src/components/Layout/MainLayout.jsx
 import React from 'react';
 import styled from 'styled-components';
+import Header from './Header';
 // Tu pourras importer un Header et un Footer ici plus tard
 // import Header from './Header';
 // import Footer from './Footer';
@@ -21,11 +22,16 @@ const MainContent = styled.main`
 
 const MainLayout = ({ children }) => {
   return (
+
     <SiteContainer>
-      {/* <Header /> */}
-      <MainContent>{children}</MainContent>
+    <Header/>
+    <MainContent>
+      {children}
+    </MainContent>
+   
       {/* <Footer /> */}
     </SiteContainer>
+    
   );
 };
 

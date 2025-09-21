@@ -47,6 +47,4 @@ export const GlobalStyle = createGlobalStyle`
     height: auto;
     display: block;
   }
-`; // La backtick fermante doit être ici
-
-// Il NE DOIT PAS y avoir un "export default GlobalStyle;" si tu importes avec des accolades.
+`;
