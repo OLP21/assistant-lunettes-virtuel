@@ -23,7 +23,7 @@ services:
       - NODE_ENV=development
       - MONGO_URI=mongodb://mongodb:27017/glassesApp
       - JWT_SECRET=Testehehehe766645786
-      - OPENAI_API_KEY=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
+      - OPENAI_API_KEY=your_openai_api_key
     depends_on:
       - mongodb
 
